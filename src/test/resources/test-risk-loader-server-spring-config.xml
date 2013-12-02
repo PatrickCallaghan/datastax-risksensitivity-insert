@@ -14,7 +14,7 @@
 
 	<bean id="riskSensitivityDao" class="com.heb.finance.analytics.RiskSensitivityDao">
 		<constructor-arg index="0" value="MyCluster" />
-		<constructor-arg index="1" value="localhost" />
+		<constructor-arg index="1" value="192.168.25.141" />
 		<constructor-arg index="2" value="Analytics" />
 	</bean>
 

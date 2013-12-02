@@ -1,38 +1,28 @@
 package com.heb.finance.analytics;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.datastax.driver.core.PreparedStatement;
 import com.heb.finance.analytics.model.RiskSensitivity;
-import com.sun.istack.NotNull;
 
-public class RiskSensitivityPersisterServiceImpl implements RiskSensitivityPersisterService{ 
+public class RiskSensitivityPersisterServiceImpl implements RiskSensitivityPersisterService {
 
-	@Autowired
+	static final Logger LOG = Logger.getLogger("SchemaSetup");
+
 	private RiskSensitivityPathPersister riskSensitivityPathPersister;
-	
-	private ExecutorService executorService; 
-	
-	public void setRiskSensitivityPathPersister(RiskSensitivityPathPersister riskSensitivityPathPersister) {
+
+	@SuppressWarnings("serial")
+	public RiskSensitivityPersisterServiceImpl(RiskSensitivityPathPersister riskSensitivityPathPersister) {
 		this.riskSensitivityPathPersister = riskSensitivityPathPersister;
 	}
 
-	@SuppressWarnings("serial")
-	public RiskSensitivityPersisterServiceImpl(int noOfWorkers) {
-		executorService = Executors.newFixedThreadPool(noOfWorkers);
-	}
-	
 	@Override
-	public void persist(@NotNull final RiskSensitivity riskSensitivity){
-		
-		executorService.execute(new Runnable(){
-			@Override
-			public void run() {
-				riskSensitivityPathPersister.batchInsert(riskSensitivity);				
-			}			
-		});	
+	public void persist(final RiskSensitivity riskSensitivity) {
+		try {
+			riskSensitivityPathPersister.batchInsert(riskSensitivity);
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, e.getMessage(), e);
+			System.exit(1);
+		}
 	}
 }

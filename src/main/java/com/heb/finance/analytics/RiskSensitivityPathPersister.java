@@ -29,7 +29,7 @@ public class RiskSensitivityPathPersister{
 			pathValueMap.put(part, riskSensitivity.getValue().doubleValue());
 		}
 		
-		this.riskSensitivityDao.insertBatch(riskSensitivity.getName(), pathValueMap);
+		this.riskSensitivityDao.insertBound(riskSensitivity.getName(), pathValueMap);
 		
 		pathValueMap.clear();
 		pathValueMap = null;

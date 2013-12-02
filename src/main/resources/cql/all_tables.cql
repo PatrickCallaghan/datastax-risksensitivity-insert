@@ -1,3 +1,5 @@
+use analytics; 
+
 create table risk_sensitivities ( 
 	hierarchy_path text, 
 	risk_sens_name text, 

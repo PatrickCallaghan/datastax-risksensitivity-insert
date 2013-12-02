@@ -4,22 +4,18 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
+import com.datastax.demo.utils.PropertyHelper;
 import com.heb.finance.analytics.model.RiskSensitivity;
+import com.heb.finance.analytics.utils.PathConverterImpl;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:test-risk-loader-server-spring-config.xml" })
-public class RiskSensitivityServiceSpringTest {
+public class RiskSensitivityInsertRunner {
 
-	private static final long STOP_COUNTER = 1000000;
+	private static final String MAX_SIZE = "1000000";
 
-	private static String[] roots = { "London", "New York", "Hong Kong", "Singapore", "Tokyo", "Paris", "Frankfurt", "Sydney" };
-	private static String[] divisions = { "FX", "Equity", "Equity Derivatives", "Bonds", "IRS", "Futures", "CDS", "ABS" };
+	private static long STOP_COUNTER = 0;
+
+	private static String[] roots = { "London", "New York", "Hong Kong", "Singapore", "Tokyo", "Paris", "Frankfurt", "Sydney", "Chicago", "Madrid" };
+	private static String[] divisions = { "FX", "Equity", "Equity Derivatives", "Bonds", "IRS", "Futures", "CDS", "ABS", "Funds", "Commodities" };
 	private static String[] sensitivities = { "irDelta", "irGamma", "irVega", "fxDelta", "fxGamma", "fxVega", "crDelta", "crGamma",
 			"crVega", "maturity" };
 	private static String DESK = "desk";
@@ -27,15 +23,24 @@ public class RiskSensitivityServiceSpringTest {
 	private static String TRADER = "trader";
 	private static Set<String> noOfDistinctPaths = new HashSet<String>();
 
-	@Autowired
 	private RiskSensitivityPersisterService riskSensitivityPersisterService;
-
-
-	@Test
-	public void testPersister() throws InterruptedException {
 		
-		//final ConsoleReporter reporter = ConsoleReporter.forRegistry().convertRatesTo(TimeUnit.SECONDS).convertDurationsTo(TimeUnit.MILLISECONDS).build();
-		//reporter.start(20, TimeUnit.SECONDS);
+	public RiskSensitivityInsertRunner(){
+		
+		String stopSizeStr = PropertyHelper.getProperty("stopSize", MAX_SIZE);
+		STOP_COUNTER = Long.parseLong(stopSizeStr);
+		
+		String keyspace = PropertyHelper.getProperty("keyspace", "analytics");
+		String contactPoints = PropertyHelper.getProperty("contactPoints", "127.0.0.1");
+		String clusterName = PropertyHelper.getProperty("clusterName", "Test Cluster");
+		
+		RiskSensitivityDao dao = new RiskSensitivityDao(clusterName, contactPoints.split(","), keyspace);
+		RiskSensitivityPathPersister riskSensitivityPathPersister = new RiskSensitivityPathPersister(dao, new PathConverterImpl());
+		
+		riskSensitivityPersisterService = new RiskSensitivityPersisterServiceImpl(riskSensitivityPathPersister);
+	}
+	
+	public void testPersister() throws InterruptedException {
 
 		long counter = 0;
 		long start = System.currentTimeMillis();
@@ -64,7 +69,7 @@ public class RiskSensitivityServiceSpringTest {
 		System.out.println("No of distinct paths " + noOfDistinctPaths.size());
 
 		noOfDistinctPaths = null;
-
+		System.exit(0);
 	}
 
 	private void sleep(long millis) {
@@ -80,8 +85,8 @@ public class RiskSensitivityServiceSpringTest {
 		String root = roots[(int) (Math.random() * roots.length)];
 		String division = divisions[(int) (Math.random() * divisions.length)];
 		String sensitivity = sensitivities[(int) (Math.random() * sensitivities.length)];
-		String desk = DESK + new Double(Math.random() * 40).intValue();
-		String trader = TRADER + new Double(Math.random() * 40).intValue();
+		String desk = DESK + new Double(Math.random() * 20).intValue();
+		String trader = TRADER + new Double(Math.random() * 20).intValue();
 		String position = POSITION  + new Double(Math.random() * 100).intValue();
 
 		String path = root + "/" + division + "/" + desk + "/" + trader + "/" + position;
@@ -90,4 +95,5 @@ public class RiskSensitivityServiceSpringTest {
 
 		return new RiskSensitivity(sensitivity, path, new BigDecimal(Math.random()*1000));
 	}
+
 }
