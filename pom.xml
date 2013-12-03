@@ -9,7 +9,7 @@
 	<name>datastax-risksensitivity-insert</name>
 
     <properties>
-		<java-driver-version>2.0.0-beta2</java-driver-version>
+		<java-driver-version>2.0.0-rc1</java-driver-version>
     </properties>
 
 	<dependencies>

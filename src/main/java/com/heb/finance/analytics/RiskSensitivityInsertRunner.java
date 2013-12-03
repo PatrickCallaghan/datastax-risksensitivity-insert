@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.datastax.demo.utils.PropertyHelper;
+import com.heb.finance.analytics.RiskSensitivityPathPersister.InsertType;
 import com.heb.finance.analytics.model.RiskSensitivity;
 import com.heb.finance.analytics.utils.PathConverterImpl;
 
@@ -32,10 +33,11 @@ public class RiskSensitivityInsertRunner {
 		
 		String keyspace = PropertyHelper.getProperty("keyspace", "analytics");
 		String contactPoints = PropertyHelper.getProperty("contactPoints", "127.0.0.1");
-		String clusterName = PropertyHelper.getProperty("clusterName", "Test Cluster");
+		String clusterName = PropertyHelper.getProperty("clusterName", "Test Cluster");		
+		String insertTypeString = PropertyHelper.getProperty("insertType", "BATCH");
 		
 		RiskSensitivityDao dao = new RiskSensitivityDao(clusterName, contactPoints.split(","), keyspace);
-		RiskSensitivityPathPersister riskSensitivityPathPersister = new RiskSensitivityPathPersister(dao, new PathConverterImpl());
+		RiskSensitivityPathPersister riskSensitivityPathPersister = new RiskSensitivityPathPersister(dao, new PathConverterImpl(), InsertType.valueOf(insertTypeString));
 		
 		riskSensitivityPersisterService = new RiskSensitivityPersisterServiceImpl(riskSensitivityPathPersister);
 	}
@@ -87,13 +89,13 @@ public class RiskSensitivityInsertRunner {
 		String sensitivity = sensitivities[(int) (Math.random() * sensitivities.length)];
 		String desk = DESK + new Double(Math.random() * 20).intValue();
 		String trader = TRADER + new Double(Math.random() * 20).intValue();
-		String position = POSITION  + new Double(Math.random() * 100).intValue();
+		String position = POSITION  + new Double(Math.random() * 50).intValue();
 
 		String path = root + "/" + division + "/" + desk + "/" + trader + "/" + position;
 
 		noOfDistinctPaths.add(path);
 
-		return new RiskSensitivity(sensitivity, path, new BigDecimal(Math.random()*1000));
+		return new RiskSensitivity(sensitivity, path, new BigDecimal(Math.random()*10));
 	}
 
 }

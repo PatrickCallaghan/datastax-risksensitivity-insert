@@ -31,20 +31,20 @@ public class RiskSensitivityDao {
 		this.cluster.shutdown();
 	}
 
-	public void insertBatch(String riskSensitivityName, Map<String, Double> pathValueMap) {
-		BatchStatement batch = new BatchStatement();
-		
-		for (String key : pathValueMap.keySet()){
-			batch.add(this.insertStmt.bind(key, riskSensitivityName, pathValueMap.get(key)));
-		}		
-		session.execute(batch);
-	}
-	
 	public void insertBound(String riskSensitivityName, Map<String, Double> pathValueMap) {
 		BoundStatement bound = new BoundStatement(insertStmt);
 		
 		for (String key : pathValueMap.keySet()){			
 			session.execute(bound.bind(key, riskSensitivityName, pathValueMap.get(key)));
 		}
+	}
+
+	public void insertBatch(String riskSensitivityName, Map<String, Double> pathValueMap) {		
+		BatchStatement batch = new BatchStatement();
+		
+		for (String key : pathValueMap.keySet()){			
+			batch.add(insertStmt.bind(key, riskSensitivityName, pathValueMap.get(key)));
+		}
+		session.execute(batch);
 	}			
 }
