@@ -26,4 +26,8 @@ To run the insert
 		
 The stopSize property allows us to specify the number of inserts we want to run. 
 
-You can also specify if you want to use a normal BoundStatement or a BatchStatement. This will allow you to test the speed difference when writing 5 records in a batch compared to 5 single writes. 
+You can also specify if you want to use a normal BoundStatement or a BatchStatement. This will allow you to test the speed difference when writing 5 records in a batch compared to 5 single writes. The default is BATCH and if you wish to specify a normal BoundStatement use -DinsertType=BOUND eg 
+
+    mvn clean compile exec:java -Dexec.mainClass="com.heb.finance.analytics.Main" -DstopSize=1000000 -DinsertType=BOUND
+    
+    
