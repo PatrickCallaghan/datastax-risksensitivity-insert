@@ -12,7 +12,6 @@ import com.datastax.driver.core.Session;
 public class RiskSensitivityDao {
 
 	static final Logger LOG = Logger.getLogger("RiskSensitivityDao");
-	private static String TABLE = "risk_sensitivity_aggregator";
 	private Cluster cluster;
 	private Session session;
 	
